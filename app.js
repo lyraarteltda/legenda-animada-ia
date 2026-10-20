@@ -627,7 +627,7 @@ const App = (function () {
     var lname = { pt: 'português do Brasil', en: 'inglês', es: 'espanhol' }[lang] || 'o idioma do próprio texto';
     return [
       'Você revisa legendas de vídeos curtos (Reels, TikTok, Shorts). Recebe a transcrição automática como uma lista numerada de palavras no formato "índice|palavra". O idioma é ' + lname + '.',
-      'Cada índice corresponde a um trecho do áudio com tempo marcado — por isso você NUNCA junta, separa, cria ou apaga palavras: cada correção troca o texto de UM índice por UM texto.',
+      'Cada índice corresponde a um trecho do áudio com tempo marcado — por isso você NUNCA junta, separa ou cria palavras: cada correção troca o texto de UM índice por UM texto. Para apagar uma palavra que a transcrição inventou ou repetiu, use o texto vazio "" nesse índice (nunca repita a palavra vizinha no lugar dela).',
       '',
       'Responda SOMENTE com um objeto JSON, sem markdown, com estas chaves:',
       '{"correcoes": [[índice, "texto corrigido"]], "destaques": [índice], "emojis": [[índice, "emoji"]]}',
@@ -660,7 +660,7 @@ const App = (function () {
           var okIdx = function (x) { x = Number(x); return Number.isInteger(x) && x >= ch[0] && x < ch[1] ? x : -1; };
           (Array.isArray(o.correcoes) ? o.correcoes : []).forEach(function (p) {
             var idx = okIdx(p && p[0]), t = p && typeof p[1] === 'string' ? p[1].replace(/\s+/g, ' ').trim() : '';
-            if (idx !== -1 && t && t.length <= 40) out[idx].w = t;
+            if (idx !== -1 && t.length <= 40 && p && typeof p[1] === 'string') { out[idx].w = t; out[idx].fixed = true; }
           });
           (Array.isArray(o.destaques) ? o.destaques : []).forEach(function (x) { var idx = okIdx(x); if (idx !== -1) out[idx].hl = true; });
           (Array.isArray(o.emojis) ? o.emojis : []).forEach(function (p) {
@@ -670,7 +670,27 @@ const App = (function () {
         });
       });
     });
-    return seq.then(function () { return out; });
+    return seq.then(function () { return dropRemoved(out, words); });
+  }
+  // Tira as palavras apagadas pela revisão ("") e as duplicatas vizinhas que uma
+  // correção criou ("o direto." → "direto. direto."), cedendo o tempo à vizinha.
+  function norm(w) { return String(w || '').toLocaleLowerCase('pt-BR').replace(/[^\wÀ-ÿ%]/g, ''); }
+  function dropRemoved(out, orig) {
+    var keep = [];
+    out.forEach(function (w, i) {
+      var prev = keep[keep.length - 1];
+      var dup = w.fixed && prev && norm(w.w) && norm(w.w) === norm(prev.w) && norm(orig[i].w) !== norm(w.w);
+      var nextW = out[i + 1];
+      var dupNext = w.fixed && nextW && norm(w.w) && norm(w.w) === norm(nextW.w) && norm(orig[i].w) !== norm(w.w);
+      if (!w.w || dup || dupNext) {
+        if (dupNext && nextW) { nextW.s = Math.min(nextW.s, w.s); if (w.hl) nextW.hl = true; if (w.emoji && !nextW.emoji) nextW.emoji = w.emoji; }
+        else if (prev) { prev.e = Math.max(prev.e, w.e); if (w.emoji && !prev.emoji) prev.emoji = w.emoji; }
+        return;
+      }
+      delete w.fixed; keep.push(w);
+    });
+    keep.forEach(function (w) { delete w.fixed; });
+    return keep;
   }
 
   function runTranscription() {
