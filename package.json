@@ -1,0 +1,13 @@
+{
+  "name": "legenda-animada-ia",
+  "version": "1.0.0",
+  "description": "Legenda animada palavra por palavra queimada no seu vídeo (Reels, TikTok, Shorts): transcrição com tempo por palavra, revisão em português e gravação do MP4 no navegador.",
+  "private": true,
+  "scripts": {
+    "dev": "npx serve .",
+    "lint": "echo 'No linter configured — static HTML project'"
+  },
+  "keywords": ["maestros-da-ia", "community-tool", "byok"],
+  "author": "APP-BUILDER-01",
+  "license": "UNLICENSED"
+}

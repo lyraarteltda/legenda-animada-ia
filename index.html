@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="gate-bootstrap.js"></script>
+  <title>Legenda Animada IA — Maestros da IA</title>
+  <meta name="description" content="Envie o seu Reels, TikTok ou Short e receba o vídeo pronto com legenda animada palavra por palavra — transcrita pela IA, revisada em português e queimada no vídeo, direto no seu navegador.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://gate.maestrosdaia.com">
+  <link rel="preload" href="https://gate.maestrosdaia.com/v1/membership-gate.js" as="script">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%23ffd23f'/%3E%3Cpath d='M5 7h22v13H15l-6 5v-5H5z' fill='%23fff' stroke='%23141414' stroke-width='2.4' stroke-linejoin='round'/%3E%3Crect x='9' y='11' width='6' height='3' fill='%23e63946'/%3E%3Crect x='17' y='11' width='6' height='3' fill='%23141414'/%3E%3C/svg%3E">
+</head>
+<body>
+
+  <!-- ═══════════ MEMBERSHIP GATE ═══════════ -->
+  <div id="gate-screen" class="screen active">
+    <div class="gate-wrap">
+      <div class="gate-intro">
+        <p class="eyebrow"><span class="eyebrow-tag">Nº 1</span>Edição especial · Reels, TikTok e Shorts</p>
+        <h1 class="display-title">Legenda <span class="hl">Animada</span> IA</h1>
+        <p class="subtitle">Envie o seu vídeo e receba ele de volta com a legenda palavra por palavra já queimada na imagem: a IA transcreve o áudio, revisa o português e marca os destaques. Você ajusta o texto e o estilo e baixa o vídeo pronto para postar.</p>
+
+        <div class="strip" aria-hidden="true">
+          <div class="strip-panel p1"><span class="balloon">85% assiste</span></div>
+          <div class="strip-panel p2"><span class="balloon balloon-hl">SEM SOM!</span></div>
+          <div class="strip-panel p3"><span class="burst">LEGENDA!</span></div>
+        </div>
+      </div>
+
+      <div class="panel gate-card">
+        <span class="panel-caption">Acesso de membro</span>
+        <h2 class="panel-title">Entre com os dados da sua compra</h2>
+        <p class="community-badge">Exclusivo para membros da Comunidade Maestros da IA</p>
+
+        <form id="gate-form" class="gate-form" novalidate>
+          <div class="form-group">
+            <label for="gate-email">Seu e-mail cadastrado</label>
+            <input type="email" id="gate-email" placeholder="seu@email.com" autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label for="gate-phone">Seu WhatsApp (com DDD)</label>
+            <input type="tel" id="gate-phone" placeholder="11999999999" autocomplete="tel">
+          </div>
+          <p class="form-hint">Basta um dos dois — e-mail <em>ou</em> WhatsApp da sua compra.</p>
+          <button type="submit" id="gate-submit" class="btn-primary btn-block">
+            <span class="btn-text">Verificar acesso</span>
+            <span class="btn-loading">Verificando...</span>
+          </button>
+          <p id="gate-error" class="error-message" role="alert"></p>
+          <p class="gate-checking"><span class="gate-checking-dot" aria-hidden="true"></span>Conferindo o seu acesso…</p>
+        </form>
+
+        <p class="gate-footer">Ainda não é membro? <a href="https://comunidade.maestrosdaia.com" target="_blank" rel="noopener noreferrer">Conheça a Comunidade Maestros da IA</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ API KEY SETUP ═══════════ -->
+  <div id="key-screen" class="screen">
+    <div class="key-wrap">
+      <div class="panel key-card">
+        <span class="panel-caption">Antes de começar</span>
+        <h2 class="panel-title">Conecte as suas chaves de IA</h2>
+        <p class="panel-text">A ferramenta usa as <strong>suas próprias chaves</strong> (BYOK). Elas ficam salvas só neste navegador e nunca passam pelos nossos servidores. O seu vídeo também nunca sai do seu computador: só o <strong>áudio</strong> vai direto daqui para o provedor da sua chave, para ser transcrito.</p>
+
+        <ol class="key-steps">
+          <li><strong>Transcrição (obrigatória):</strong> uma chave da <strong>fal.ai</strong> (recomendado — um minuto de vídeo custa uma fração de centavo) <em>ou</em> da <strong>OpenAI</strong>.</li>
+          <li><strong>Revisão com IA (opcional):</strong> uma chave da <strong>OpenRouter</strong> corrige ortografia e pontuação sem mexer no tempo das palavras e escolhe as palavras de destaque e os emojis.</li>
+        </ol>
+
+        <form id="key-inputs" class="key-inputs" novalidate></form>
+
+        <div class="field">
+          <label for="key-model-select">Modelo da revisão (OpenRouter)</label>
+          <select id="key-model-select"></select>
+        </div>
+
+        <div class="key-actions">
+          <button id="key-continue" class="btn-primary" disabled>Abrir o estúdio</button>
+          <button id="key-skip" class="btn-secondary">Pular por enquanto</button>
+        </div>
+
+        <details class="key-info">
+          <summary>Como consigo uma chave da fal.ai?</summary>
+          <div class="key-info-content">
+            <p>Crie uma conta em <code>fal.ai</code>, abra <code>fal.ai/dashboard/keys</code> e clique em <em>Add key</em>. Adicione créditos (a partir de US$ 5 — dá para centenas de vídeos) e cole a chave aqui. Ela tem o formato <code>xxxxxxxx-...:xxxxxxxx</code>.</p>
+          </div>
+        </details>
+        <details class="key-info">
+          <summary>E a chave da OpenAI ou da OpenRouter?</summary>
+          <div class="key-info-content">
+            <p><strong>OpenAI:</strong> em <code>platform.openai.com/api-keys</code> crie uma chave <code>sk-...</code>; a conta precisa ter créditos.</p>
+            <p><strong>OpenRouter:</strong> em <code>openrouter.ai/keys</code> clique em <em>Create Key</em> e cole a chave <code>sk-or-...</code>. A revisão de um vídeo de 1 minuto custa menos de um centavo com o Gemini Flash.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ MAIN APPLICATION ═══════════ -->
+  <div id="app-screen" class="screen">
+    <header class="app-header">
+      <div class="header-left">
+        <svg class="brandmark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="4" fill="#ffd23f"/><path d="M5 7h22v13H15l-6 5v-5H5z" fill="#fff" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/><rect x="9" y="11" width="6" height="3" fill="#e63946"/><rect x="17" y="11" width="6" height="3" fill="#141414"/></svg>
+        <div class="header-titles">
+          <h1 class="app-title">Legenda Animada IA</h1>
+          <span class="file-pill" id="file-pill" hidden></span>
+        </div>
+      </div>
+      <div class="header-right">
+        <a href="about.html" class="btn-icon" title="Sobre esta ferramenta" aria-label="Sobre esta ferramenta">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </a>
+        <button id="manage-keys-btn" class="btn-icon" title="Gerenciar chaves de IA" aria-label="Gerenciar chaves de IA">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+        </button>
+        <button id="logout-btn" class="btn-icon" title="Sair" aria-label="Sair">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="studio">
+
+      <!-- ── PALCO: o quadro principal com o vídeo ── -->
+      <section class="stage" aria-label="Pré-visualização do vídeo">
+        <div class="panel stage-panel">
+          <span class="panel-caption" id="stage-caption">Quadro 1 · o seu vídeo</span>
+
+          <label class="dropzone" id="dropzone" for="file-input">
+            <input type="file" id="file-input" class="sr-only" accept="video/*,.mp4,.mov,.webm,.m4v">
+            <span class="burst burst-big" aria-hidden="true">VÍDEO!</span>
+            <span class="dz-title">Solte o seu vídeo aqui</span>
+            <span class="dz-sub">ou toque para escolher · MP4, MOV ou WebM · até 3 minutos e 500 MB · vertical ou horizontal</span>
+          </label>
+
+          <div class="player" id="player" hidden>
+            <div class="screenbox" id="screenbox">
+              <video id="video" playsinline preload="auto"></video>
+              <canvas id="overlay" aria-hidden="true"></canvas>
+            </div>
+            <div class="transport">
+              <button id="play-btn" class="btn-round" type="button" aria-label="Reproduzir">
+                <svg class="ic-play" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>
+                <svg class="ic-pause" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="4.5" width="4" height="15" fill="currentColor"/><rect x="14" y="4.5" width="4" height="15" fill="currentColor"/></svg>
+              </button>
+              <input type="range" id="scrub" min="0" max="1000" value="0" step="1" aria-label="Posição no vídeo">
+              <span class="timecode" id="timecode">0:00 / 0:00</span>
+              <button id="mute-btn" class="btn-round btn-round-sm" type="button" aria-label="Tirar o som" aria-pressed="false">
+                <svg class="ic-sound" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>
+                <svg class="ic-muted" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="m16 9 5 6M21 9l-5 6"/></svg>
+              </button>
+            </div>
+            <div class="file-actions">
+              <button id="change-video" class="btn-ghost btn-small" type="button">Trocar vídeo</button>
+              <span class="file-meta" id="file-meta"></span>
+            </div>
+          </div>
+
+          <p class="dz-note" id="dz-note" role="alert" hidden></p>
+          <button id="sample-btn" class="btn-ghost sample-btn" type="button">Experimentar com o vídeo de exemplo (já transcrito, sem gastar crédito)</button>
+        </div>
+      </section>
+
+      <!-- ── BANCADA: as etapas ── -->
+      <section class="bench" aria-label="Etapas">
+        <nav class="tabs" role="tablist" aria-label="Etapas">
+          <button class="tab on" role="tab" id="tab-transcrever" data-tab="transcrever" aria-selected="true" aria-controls="pane-transcrever"><span class="tab-n">1</span><span class="tab-t">Transcrever</span></button>
+          <button class="tab" role="tab" id="tab-texto" data-tab="texto" aria-selected="false" aria-controls="pane-texto" tabindex="-1"><span class="tab-n">2</span><span class="tab-t">Texto</span><span class="tab-count" id="count-cues" hidden>0</span></button>
+          <button class="tab" role="tab" id="tab-estilo" data-tab="estilo" aria-selected="false" aria-controls="pane-estilo" tabindex="-1"><span class="tab-n">3</span><span class="tab-t">Estilo</span></button>
+          <button class="tab" role="tab" id="tab-exportar" data-tab="exportar" aria-selected="false" aria-controls="pane-exportar" tabindex="-1"><span class="tab-n">4</span><span class="tab-t">Exportar</span></button>
+        </nav>
+
+        <!-- 1. TRANSCREVER -->
+        <div class="pane on" id="pane-transcrever" role="tabpanel" aria-labelledby="tab-transcrever">
+          <div class="panel">
+            <span class="panel-caption">Etapa 1</span>
+            <h2 class="panel-title">Da fala para as palavras</h2>
+            <p class="panel-text">A ferramenta tira o áudio do vídeo aqui mesmo no navegador e manda só o áudio para o provedor da sua chave. Volta cada palavra com o instante exato em que ela é dita.</p>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="in-provider">Quem transcreve</label>
+                <select id="in-provider"></select>
+              </div>
+              <div class="field">
+                <label for="in-lang">Idioma falado</label>
+                <select id="in-lang">
+                  <option value="pt">Português</option>
+                  <option value="en">Inglês</option>
+                  <option value="es">Espanhol</option>
+                  <option value="">Detectar sozinho</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="check-row">
+              <input type="checkbox" id="in-review" checked>
+              <label for="in-review"><strong>Revisar com IA</strong> — corrige ortografia, acentos e pontuação, escolhe as palavras de destaque e sugere emojis. Usa a sua chave da OpenRouter.</label>
+            </div>
+            <div class="field" id="review-model-field">
+              <label for="model-select">Modelo da revisão</label>
+              <select id="model-select"></select>
+            </div>
+            <div class="field">
+              <label for="in-vocab">Nomes e termos que aparecem no vídeo <span class="opt">(opcional — ajuda a acertar)</span></label>
+              <input type="text" id="in-vocab" maxlength="200" placeholder="Ex.: Maestros da IA, ChatGPT, Reels, Hotmart">
+            </div>
+
+            <p class="key-warn" id="key-warn" hidden></p>
+            <div class="actions">
+              <button id="transcribe-btn" class="btn-primary" type="button" disabled>Transcrever o vídeo</button>
+              <button id="cancel-btn" class="btn-secondary" type="button" hidden>Cancelar</button>
+            </div>
+            <div class="progress" id="tr-progress" hidden>
+              <div class="progress-track"><div class="progress-fill" id="tr-fill"></div></div>
+              <p class="progress-text" id="tr-text" role="status" aria-live="polite"></p>
+            </div>
+            <p class="error-box" id="tr-error" role="alert" hidden></p>
+          </div>
+        </div>
+
+        <!-- 2. TEXTO -->
+        <div class="pane" id="pane-texto" role="tabpanel" aria-labelledby="tab-texto">
+          <div class="panel">
+            <span class="panel-caption">Etapa 2</span>
+            <h2 class="panel-title">As cartelas da legenda</h2>
+            <p class="panel-text">Cada quadrinho é uma cartela que aparece na tela. Toque no tempo para pular até ela no vídeo; corrija o texto direto no balão. As palavras de destaque estão entre <code>*asteriscos*</code> — apague ou acrescente à vontade.</p>
+            <div class="field-row field-row-tight">
+              <div class="field">
+                <label for="in-words">Palavras por cartela</label>
+                <select id="in-words">
+                  <option value="1">1 — uma palavra por vez</option>
+                  <option value="2">até 2</option>
+                  <option value="3" selected>até 3</option>
+                  <option value="4">até 4</option>
+                  <option value="6">até 6 (frase curta)</option>
+                </select>
+              </div>
+              <div class="field field-btn">
+                <button id="regroup-btn" class="btn-secondary" type="button">Reagrupar as cartelas</button>
+              </div>
+            </div>
+            <p class="field-note" id="regroup-note">Reagrupar refaz as cartelas a partir das palavras e mantém as suas correções de texto.</p>
+          </div>
+          <div class="cues" id="cue-list" aria-live="polite"></div>
+          <p class="empty-note" id="cues-empty">As cartelas aparecem aqui depois que o vídeo for transcrito na etapa 1 (ou com o vídeo de exemplo).</p>
+        </div>
+
+        <!-- 3. ESTILO -->
+        <div class="pane" id="pane-estilo" role="tabpanel" aria-labelledby="tab-estilo">
+          <div class="panel">
+            <span class="panel-caption">Etapa 3</span>
+            <h2 class="panel-title">O visual da legenda</h2>
+            <p class="panel-text">Escolha um estilo — a pré-visualização ao lado muda na hora. Depois ajuste fonte, tamanho, posição e cores.</p>
+            <div class="presets" id="presets" role="radiogroup" aria-label="Estilo da legenda"></div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="st-font">Fonte</label>
+                <select id="st-font">
+                  <option value="Montserrat">Montserrat Black</option>
+                  <option value="Anton">Anton (condensada)</option>
+                  <option value="Bangers">Bangers (gibi)</option>
+                  <option value="Permanent Marker">Permanent Marker (pincel)</option>
+                  <option value="Nunito">Nunito (arredondada)</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="st-anim">Animação da palavra</label>
+                <select id="st-anim">
+                  <option value="pop">Pulo (pop)</option>
+                  <option value="none">Sem animação</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label for="st-size">Tamanho do texto <output id="st-size-out" for="st-size"></output></label>
+              <input type="range" id="st-size" min="4" max="14" step="0.5" value="8">
+            </div>
+            <div class="field">
+              <label for="st-pos">Posição na tela <output id="st-pos-out" for="st-pos"></output></label>
+              <input type="range" id="st-pos" min="10" max="90" step="1" value="70">
+              <p class="field-note">No Reels e no TikTok, a faixa de baixo é coberta pela legenda do post e pelos botões — por volta de 65–75% costuma ficar livre.</p>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="st-color">Cor do texto</label>
+                <input type="color" id="st-color" value="#ffffff">
+              </div>
+              <div class="field">
+                <label for="st-hl">Cor do destaque</label>
+                <input type="color" id="st-hl" value="#ffd23f">
+              </div>
+            </div>
+            <div class="check-row">
+              <input type="checkbox" id="st-upper" checked>
+              <label for="st-upper">Tudo em CAIXA ALTA</label>
+            </div>
+            <div class="check-row">
+              <input type="checkbox" id="st-emoji" checked>
+              <label for="st-emoji">Mostrar os emojis sugeridos pela revisão</label>
+            </div>
+            <div class="actions">
+              <button id="save-style" class="btn-secondary" type="button">Salvar como o meu estilo</button>
+              <button id="load-style" class="btn-ghost" type="button" hidden>Usar o meu estilo salvo</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. EXPORTAR -->
+        <div class="pane" id="pane-exportar" role="tabpanel" aria-labelledby="tab-exportar">
+          <div class="panel">
+            <span class="panel-caption">Etapa 4</span>
+            <h2 class="panel-title">O vídeo pronto</h2>
+            <p class="panel-text">A ferramenta reproduz o vídeo do começo ao fim e grava cada quadro com a legenda por cima, com o áudio original. Leva o mesmo tempo do vídeo (um Reels de 30 s leva uns 30 s). <strong>Deixe esta aba aberta e visível</strong> enquanto grava.</p>
+            <div class="field">
+              <label for="ex-res">Resolução</label>
+              <select id="ex-res">
+                <option value="1080">Até 1080 px no lado menor (Full HD)</option>
+                <option value="720">Até 720 px no lado menor (arquivo menor)</option>
+              </select>
+            </div>
+            <p class="format-note" id="format-note"></p>
+            <div class="actions">
+              <button id="export-btn" class="btn-pow" type="button" disabled><span>Gravar o vídeo legendado</span></button>
+              <button id="export-cancel" class="btn-secondary" type="button" hidden>Parar</button>
+            </div>
+            <div class="progress" id="ex-progress" hidden>
+              <div class="progress-track"><div class="progress-fill" id="ex-fill"></div></div>
+              <p class="progress-text" id="ex-text" role="status" aria-live="polite"></p>
+            </div>
+            <p class="error-box" id="ex-error" role="alert" hidden></p>
+
+            <div class="result" id="result" hidden>
+              <span class="panel-caption panel-caption-hl">Pronto!</span>
+              <video id="result-video" controls playsinline></video>
+              <a id="dl-video" class="btn-primary btn-block" download>Baixar o vídeo</a>
+              <p class="field-note" id="result-meta"></p>
+            </div>
+
+            <div class="side-exports">
+              <button id="dl-srt" class="btn-secondary" type="button" disabled>Baixar legenda .SRT</button>
+              <button id="dl-txt" class="btn-ghost" type="button" disabled>Baixar texto .TXT</button>
+            </div>
+            <p class="field-note">O .SRT serve para subir no YouTube, no Instagram ou em qualquer editor como legenda separada.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <p>Legenda Animada IA · uma ferramenta da Comunidade Maestros da IA</p>
+      <p class="footer-links"><a href="about.html">Sobre</a><a href="privacy-policy.html">Política de Privacidade</a><a href="data-deletion.html">Excluir meus dados</a><button type="button" class="link-btn" id="wipe-local">Apagar dados deste navegador</button></p>
+    </footer>
+  </div>
+
+  <!-- Chaves de IA -->
+  <div id="key-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="key-modal-title">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="key-modal-title">Chaves de IA</h3>
+        <button id="modal-close" class="btn-icon" type="button" aria-label="Fechar">×</button>
+      </div>
+      <form id="modal-key-inputs" class="key-inputs" novalidate></form>
+      <div class="field">
+        <label for="model-select-modal">Modelo da revisão (OpenRouter)</label>
+        <select id="model-select-modal"></select>
+      </div>
+      <div class="modal-actions">
+        <button id="modal-clear" class="btn-ghost" type="button">Apagar chaves</button>
+        <button id="modal-save" class="btn-primary" type="button">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="config.js"></script>
+  <script src="kill-switch.js"></script>
+  <script src="rate-limiter.js"></script>
+  <script src="https://gate.maestrosdaia.com/v1/membership-gate.js"></script>
+  <script src="api-key-manager.js"></script>
+  <script src="feedback-widget.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
